@@ -1,84 +1,763 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
+<!doctype html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chengze Liu</title>
-
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Chengze Liu is an EECS student at Peking University interested in robotics and robot learning." />
+  <title>Chengze Liu | Robotics</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23f7f8f4'/%3E%3Crect x='10' y='10' width='44' height='44' fill='%23fff' stroke='%231f2428' stroke-width='3'/%3E%3Ctext x='32' y='39' text-anchor='middle' font-family='Georgia,serif' font-size='22' font-weight='700' fill='%23176f76'%3ECL%3C/text%3E%3C/svg%3E" />
   <style>
+    :root {
+      --ink: #1f2428;
+      --muted: #687076;
+      --line: #d9e0df;
+      --paper: #f7f8f4;
+      --surface: #ffffff;
+      --accent: #176f76;
+      --accent-soft: #dcefee;
+      --shadow: 0 22px 70px rgba(31, 36, 40, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
     body {
-      font-family: Arial, sans-serif;
-      max-width: 800px;
-      margin: 80px auto;
-      padding: 0 24px;
-      line-height: 1.7;
-      color: #222;
+      margin: 0;
+      background:
+        linear-gradient(90deg, rgba(23, 111, 118, 0.05) 1px, transparent 1px),
+        linear-gradient(180deg, rgba(23, 111, 118, 0.05) 1px, transparent 1px),
+        var(--paper);
+      background-size: 44px 44px;
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.65;
     }
 
-    h1 {
-      font-size: 48px;
-      margin-bottom: 10px;
+    a {
+      color: inherit;
     }
 
-    nav {
-      margin: 30px 0;
+    .shell {
+      width: min(1120px, calc(100% - 48px));
+      margin: 0 auto;
     }
 
-    nav a {
-      margin-right: 20px;
-      color: #0366d6;
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      border-bottom: 1px solid rgba(217, 224, 223, 0.82);
+      background: rgba(247, 248, 244, 0.9);
+      backdrop-filter: blur(18px);
+    }
+
+    .nav {
+      min-height: 76px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
       text-decoration: none;
     }
 
-    nav a:hover {
-      text-decoration: underline;
-    }
-
-    .intro {
+    .brand-mark {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--ink);
+      background: var(--surface);
+      color: var(--accent);
+      font-family: Georgia, serif;
       font-size: 20px;
-      color: #555;
+      font-weight: 700;
+      box-shadow: 6px 6px 0 var(--accent-soft);
     }
 
-    footer {
-      margin-top: 80px;
-      color: #888;
+    .brand-text strong,
+    .brand-text span {
+      display: block;
+    }
+
+    .brand-text strong {
+      font-size: 15px;
+      line-height: 1.2;
+    }
+
+    .brand-text span,
+    .eyebrow,
+    .meta {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .nav-links a {
+      padding: 8px 10px;
+      color: var(--muted);
+      font-size: 14px;
+      text-decoration: none;
+    }
+
+    .nav-links a:hover {
+      color: var(--ink);
+      background: rgba(255, 255, 255, 0.7);
+    }
+
+    main {
+      padding-bottom: 96px;
+    }
+
+    .hero {
+      min-height: calc(100vh - 76px);
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr);
+      align-items: center;
+      gap: 64px;
+      padding: 58px 0 76px;
+    }
+
+    .eyebrow {
+      margin: 0 0 18px;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin-top: 0;
+    }
+
+    h1,
+    h2 {
+      font-family: Georgia, "Times New Roman", serif;
+      font-weight: 500;
+      letter-spacing: 0;
+    }
+
+    h1 {
+      max-width: 760px;
+      margin-bottom: 24px;
+      font-size: clamp(48px, 8vw, 92px);
+      line-height: 0.98;
+    }
+
+    h1 span {
+      color: var(--accent);
+      font-style: italic;
+    }
+
+    .lead {
+      max-width: 680px;
+      color: #3e474c;
+      font-size: 20px;
+      line-height: 1.75;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 34px;
+    }
+
+    .button {
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 16px;
+      border: 1px solid var(--ink);
+      background: var(--ink);
+      color: #fff;
+      font-size: 14px;
+      text-decoration: none;
+    }
+
+    .button.secondary {
+      background: transparent;
+      color: var(--ink);
+    }
+
+    .button:hover {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .identity-panel {
+      padding: 34px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.86);
+      box-shadow: var(--shadow);
+    }
+
+    .portrait {
+      min-height: 210px;
+      display: grid;
+      place-items: center;
+      margin-bottom: 28px;
+      border: 1px solid var(--line);
+      background:
+        radial-gradient(circle at 24% 24%, rgba(173, 106, 66, 0.18), transparent 31%),
+        linear-gradient(135deg, rgba(23, 111, 118, 0.16), rgba(255, 255, 255, 0.75));
+      overflow: hidden;
+    }
+
+    .portrait svg {
+      width: min(260px, 80%);
+      height: auto;
+    }
+
+    .facts {
+      display: grid;
+      gap: 14px;
+      margin: 0;
+    }
+
+    .fact {
+      display: grid;
+      grid-template-columns: 96px 1fr;
+      gap: 18px;
+      padding-top: 14px;
+      border-top: 1px solid var(--line);
+    }
+
+    .fact dt {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .fact dd {
+      margin: 0;
+      color: var(--ink);
+      font-size: 14px;
+    }
+
+    section {
+      scroll-margin-top: 104px;
+      padding: 62px 0;
+      border-top: 1px solid var(--line);
+    }
+
+    .section-grid {
+      display: grid;
+      grid-template-columns: 260px minmax(0, 1fr);
+      gap: 54px;
+      align-items: start;
+    }
+
+    h2 {
+      margin-bottom: 10px;
+      font-size: clamp(34px, 4.5vw, 56px);
+      line-height: 1;
+    }
+
+    .section-kicker {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .content p {
+      max-width: 760px;
+      color: #3f484d;
+      font-size: 17px;
+    }
+
+    .research-list {
+      display: grid;
+      gap: 14px;
+      margin: 28px 0 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .research-list li,
+    .project-empty {
+      padding: 18px 20px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.78);
+      color: #3f484d;
+    }
+
+    .project-empty strong {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--ink);
+      font-size: 18px;
+    }
+
+    .blog-toolbar {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 26px;
+    }
+
+    .blog-toolbar p {
+      max-width: 620px;
+      margin-bottom: 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .blog-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .post {
+      display: flex;
+      flex-direction: column;
+      min-height: 235px;
+      padding: 24px;
+      border: 1px solid var(--line);
+      background: var(--surface);
+    }
+
+    .post h3 {
+      margin-bottom: 12px;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 25px;
+      font-weight: 500;
+      line-height: 1.2;
+    }
+
+    .post-content {
+      color: #465055;
+      font-size: 14px;
+      white-space: pre-wrap;
+    }
+
+    .post-footer {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 14px;
+      margin-top: auto;
+      padding-top: 18px;
+      border-top: 1px solid #edf1ef;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .tag {
+      padding: 3px 8px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .site-footer {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 24px 0 34px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    @media (max-width: 860px) {
+      .hero,
+      .section-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero {
+        min-height: auto;
+        gap: 36px;
+        padding-top: 44px;
+      }
+
+      .blog-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .shell {
+        width: min(100% - 32px, 560px);
+      }
+
+      .nav {
+        min-height: 68px;
+        align-items: flex-start;
+        flex-direction: column;
+        justify-content: center;
+        padding: 12px 0;
+      }
+
+      .nav-links {
+        justify-content: flex-start;
+      }
+
+      .nav-links a {
+        padding: 4px 8px 4px 0;
+      }
+
+      h1 {
+        font-size: clamp(46px, 16vw, 72px);
+      }
+
+      .lead {
+        font-size: 18px;
+      }
+
+      .identity-panel {
+        padding: 22px;
+      }
+
+      .fact {
+        grid-template-columns: 1fr;
+        gap: 4px;
+      }
+
+      section {
+        scroll-margin-top: 132px;
+        padding: 46px 0;
+      }
+
+      .blog-toolbar,
+      .site-footer {
+        align-items: flex-start;
+        flex-direction: column;
+      }
     }
   </style>
 </head>
-
 <body>
+  <header class="site-header">
+    <div class="shell nav">
+      <a class="brand" href="#top" aria-label="Chengze Liu home">
+        <span class="brand-mark">CL</span>
+        <span class="brand-text">
+          <strong>Chengze Liu</strong>
+          <span>刘宬泽</span>
+        </span>
+      </a>
+      <nav class="nav-links" aria-label="Primary navigation">
+        <a href="#about">About</a>
+        <a href="#research">Research</a>
+        <a href="#projects">Projects</a>
+        <a href="#blog">Blog</a>
+        <a href="mailto:3376506461@qq.com">Email</a>
+      </nav>
+    </div>
+  </header>
 
-  <h1>Chengze Liu</h1>
+  <main id="top" class="shell">
+    <section class="hero" aria-label="Introduction">
+      <div>
+        <p class="eyebrow">Peking University EECS · Robotics</p>
+        <h1>Hi, I am <span>Chengze Liu.</span></h1>
+        <p class="lead">
+          I am an EECS student at Peking University, interested in robotics, embodied intelligence,
+          robot learning, and the practical systems that connect perception with action.
+        </p>
+        <div class="hero-actions">
+          <a class="button" href="mailto:3376506461@qq.com">3376506461@qq.com</a>
+          <a class="button secondary" href="#blog">Read my notes</a>
+        </div>
+      </div>
 
-  <p class="intro">
-    Welcome to my personal website.
-  </p>
+      <aside class="identity-panel" aria-label="Profile summary">
+        <div class="portrait" aria-hidden="true">
+          <svg viewBox="0 0 320 220" role="img">
+            <title>Robotics line illustration</title>
+            <g fill="none" stroke="#176f76" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M72 154h176" stroke-width="3" />
+              <path d="M160 142v-48" stroke-width="4" />
+              <path d="M130 94h60c14 0 25 11 25 25v23H105v-23c0-14 11-25 25-25Z" stroke-width="4" fill="rgba(220,239,238,.58)" />
+              <path d="M122 94l-24-30M198 94l24-30" stroke-width="4" />
+              <circle cx="92" cy="56" r="14" stroke-width="4" fill="#fff" />
+              <circle cx="228" cy="56" r="14" stroke-width="4" fill="#fff" />
+              <circle cx="137" cy="120" r="7" stroke-width="3" fill="#176f76" />
+              <circle cx="183" cy="120" r="7" stroke-width="3" fill="#176f76" />
+              <path d="M142 144c12 9 25 9 37 0" stroke-width="3" />
+              <path d="M105 142l-34 24M215 142l34 24" stroke-width="4" />
+              <circle cx="65" cy="169" r="10" stroke-width="4" fill="#fff" />
+              <circle cx="255" cy="169" r="10" stroke-width="4" fill="#fff" />
+            </g>
+          </svg>
+        </div>
+        <dl class="facts">
+          <div class="fact">
+            <dt>Name</dt>
+            <dd>Chengze Liu · 刘宬泽</dd>
+          </div>
+          <div class="fact">
+            <dt>Education</dt>
+            <dd>EECS, Peking University</dd>
+          </div>
+          <div class="fact">
+            <dt>Focus</dt>
+            <dd>Robotics and robot learning</dd>
+          </div>
+          <div class="fact">
+            <dt>Email</dt>
+            <dd><a href="mailto:3376506461@qq.com">3376506461@qq.com</a></dd>
+          </div>
+        </dl>
+      </aside>
+    </section>
 
-  <nav>
-    <a href="/">Home</a>
-    <a href="/about.html">About</a>
-    <a href="/blog.html">Blog</a>
-    <a href="/projects.html">Projects</a>
-  </nav>
+    <section id="about">
+      <div class="section-grid">
+        <div>
+          <p class="eyebrow">About</p>
+          <h2>Student, builder, learner.</h2>
+          <p class="section-kicker">A personal homepage for research notes and work in progress.</p>
+        </div>
+        <div class="content">
+          <p>
+            I am currently studying in the School of Electronics Engineering and Computer Science
+            at Peking University. My academic interest centers on robotics: how robots perceive
+            their environment, learn from data, and eventually complete useful physical tasks.
+          </p>
+          <p>
+            This site keeps my public profile simple: research direction, contact information,
+            projects when they are ready, and notes from my personal blog.
+          </p>
+        </div>
+      </div>
+    </section>
 
-  <hr>
+    <section id="research">
+      <div class="section-grid">
+        <div>
+          <p class="eyebrow">Research</p>
+          <h2>Robotics in the real world.</h2>
+        </div>
+        <div class="content">
+          <p>
+            I am especially interested in embodied intelligence and robot learning pipelines:
+            data collection, policy learning, manipulation, evaluation, and the engineering details
+            that make research systems reproducible.
+          </p>
+          <ul class="research-list">
+            <li>Robot learning and manipulation</li>
+            <li>Embodied AI systems</li>
+            <li>Data collection and practical robotics infrastructure</li>
+          </ul>
+        </div>
+      </div>
+    </section>
 
-  <h2>About Me</h2>
+    <section id="projects">
+      <div class="section-grid">
+        <div>
+          <p class="eyebrow">Projects</p>
+          <h2>Selected work.</h2>
+        </div>
+        <div class="content">
+          <div class="project-empty">
+            <strong>暂无</strong>
+            <span>Projects will be added here when they are ready to share.</span>
+          </div>
+        </div>
+      </div>
+    </section>
 
-  <p>
-    Hi, I'm Chengze Liu. This is my personal website where I share
-    my projects, notes, and thoughts.
-  </p>
+    <section id="blog">
+      <div class="blog-toolbar">
+        <div>
+          <p class="eyebrow">Blog</p>
+          <h2>Public notes</h2>
+        </div>
+        <p>
+          Synced from the public entries available in my local blog archive at D:\blog.
+        </p>
+      </div>
 
-  <h2>Latest Posts</h2>
+      <div class="blog-grid">
+        <article class="post">
+          <div class="meta">2026-09-13 · Beijing Haidian</div>
+          <h3>20260913</h3>
+          <p class="post-content">今天忙着采数据，也没干成啥。
+配codex真的好麻烦。
+好困。</p>
+          <div class="post-footer"><span class="tag">Public</span><span>From local blog</span></div>
+        </article>
 
-  <p>
-    My first blog post is coming soon.
-  </p>
+        <article class="post">
+          <div class="meta">2026-09-12 · Beijing Haidian</div>
+          <h3>20260912</h3>
+          <p class="post-content">今天有一点偷懒了，十二点才起，也没怎么认真采数据，明天好好干。
+和李崇宇吃饭，终于见到了。</p>
+          <div class="post-footer"><span class="tag">Public</span><span>From local blog</span></div>
+        </article>
 
-  <footer>
-    © 2026 Chengze Liu
+        <article class="post">
+          <div class="meta">2026-09-11 · Beijing Haidian</div>
+          <h3>20260911</h3>
+          <p class="post-content">今天上德语课，德语好难。。。控制不住走神，但我困也没办法。
+生成模型挺好的。
+宫西诚给我挂了二作！！！我要努力奋斗！！</p>
+          <div class="post-footer"><span class="tag">Public</span><span>From local blog</span></div>
+        </article>
+
+        <article class="post">
+          <div class="meta">2026-09-10 · Beijing Haidian</div>
+          <h3>20260910</h3>
+          <p class="post-content">今天好困，上了一天课，没做科研。
+人工智能金融学大水课。
+强化学习大水课。
+综测居然比去年差，选计算机方向有点吃亏了。
+现在选课有点多，准备退课。</p>
+          <div class="post-footer"><span class="tag">Public</span><span>From local blog</span></div>
+        </article>
+
+        <article class="post">
+          <div class="meta">2026-09-09 · Beijing Haidian</div>
+          <h3>20260909</h3>
+          <p class="post-content">今天一觉睡到两点。。。
+下午打了会儿游戏。就去上日语了。
+计组可能要手动选课。
+晚上也没干啥，chatgpt不好使了，真难受。
+准备花钱充ai</p>
+          <div class="post-footer"><span class="tag">Public</span><span>From local blog</span></div>
+        </article>
+
+        <article class="post">
+          <div class="meta">2026-09-08 · Beijing Haidian</div>
+          <h3>20260908</h3>
+          <p class="post-content">今天干活浪费了几个小时，等下载等了好久。
+好困。
+还是要加快进度咯。</p>
+          <div class="post-footer"><span class="tag">Public</span><span>From local blog</span></div>
+        </article>
+
+        <article class="post">
+          <div class="meta">2026-09-07 · Beijing Haidian</div>
+          <h3>20260907</h3>
+          <p class="post-content">今天上了一天课，没吃饭，好累。
+宫西诚又加了个新人，唉唉。
+提升自己，多读论文多学习。
+日语五十音真tm难记啊。
+什么时候能lead一个项目？</p>
+          <div class="post-footer"><span class="tag">Public</span><span>From local blog</span></div>
+        </article>
+
+        <article class="post">
+          <div class="meta">2026-09-06 · Beijing Haidian</div>
+          <h3>20260906</h3>
+          <p class="post-content">今天活有点慢，感觉宫西诚有点急
+尽我所能吧
+开学之后抽一点时间去干
+少玩手机</p>
+          <div class="post-footer"><span class="tag">Public</span><span>From local blog</span></div>
+        </article>
+
+        <article class="post">
+          <div class="meta">2026-09-05 · Beijing Haidian</div>
+          <h3>20260905</h3>
+          <p class="post-content">今天是超级无敌开心的一天！！！
+就是活干的有点慢，感觉宫西诚有点急了，不过他人真好，不生气
+学习到了好多知识，今天完成了对pi0.5的微调
+宫西诚也是个球迷
+我的AI什么时候才能备好，中转站太坑了
+羡慕财富自由（小自由）的日子，努力保研</p>
+          <div class="post-footer"><span class="tag">Public</span><span>From local blog</span></div>
+        </article>
+
+        <article class="post">
+          <div class="meta">2026-09-04 · Beijing Haidian</div>
+          <h3>20260904</h3>
+          <p class="post-content">今天是特别开心的一天！！！
+今天主要做的事情是采集数据
+选课运气特别好，日语没掉课
+宫西诚请我吃饭
+好好干活！！！</p>
+          <div class="post-footer"><span class="tag">Public</span><span>From local blog</span></div>
+        </article>
+
+        <article class="post">
+          <div class="meta">2026-09-03 · Beijing Haidian</div>
+          <h3>20260903</h3>
+          <p class="post-content">今天做事情好慢。。。不过也可能是遇见的小事情太多了
+干了一点数据采集
+务必不要让宫西诚生气
+好好干活！！！</p>
+          <div class="post-footer"><span class="tag">Public</span><span>From local blog</span></div>
+        </article>
+
+        <article class="post">
+          <div class="meta">2026-09-02 · Beijing Haidian</div>
+          <h3>20260902</h3>
+          <p class="post-content">今天活干得好慢，好怕辜负宫西诚。
+逐渐掌握方法吧。好好学习少看手机</p>
+          <div class="post-footer"><span class="tag">Public</span><span>From local blog</span></div>
+        </article>
+
+        <article class="post">
+          <div class="meta">2026-09-01 · Beijing Haidian</div>
+          <h3>20260901</h3>
+          <p class="post-content">自习，和AI打交道。
+就是内心焦躁不安，老是幻想，老毛病了。
+沉静下来学习，要是发一篇就保研呢</p>
+          <div class="post-footer"><span class="tag">Public</span><span>From local blog</span></div>
+        </article>
+
+        <article class="post">
+          <div class="meta">2026-08-31 · Beijing Haidian</div>
+          <h3>20260831</h3>
+          <p class="post-content">今天特别特别困。
+在王选所只待了五个小时，看了一点论文，问了一点ai。准备放弃RoboTwin了。
+和王一吃夜宵。</p>
+          <div class="post-footer"><span class="tag">Public</span><span>From local blog</span></div>
+        </article>
+
+        <article class="post">
+          <div class="meta">2026-08-30 · Beijing Haidian</div>
+          <h3>20260830</h3>
+          <p class="post-content">今天主要是自学。
+看陈天行的具身智能指南，RoboTwin还没部署明白
+晚上看ACT,逐渐开始理解，还是要多学习
+和宫西诚交流，科研里有容易获得的成果，可以照葫芦画瓢混口饭吃
+后面好好努力学习哈</p>
+          <div class="post-footer"><span class="tag">Public</span><span>From local blog</span></div>
+        </article>
+
+        <article class="post">
+          <div class="meta">2026-08-29 · Beijing Haidian</div>
+          <h3>20260829</h3>
+          <p class="post-content">调整摄像头真机设备
+发现摄像头时间不同步，尝试解决
+看学长给的PPT，决定努力学习</p>
+          <div class="post-footer"><span class="tag">Public</span><span>From local blog</span></div>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="shell site-footer">
+    <span>© 2026 Chengze Liu</span>
+    <span>EECS, Peking University · Robotics</span>
   </footer>
-
 </body>
 </html>
