@@ -11,12 +11,12 @@ function Escape-Html {
     return ""
   }
 
-  return $Value.
-    Replace("&", "&amp;").
-    Replace("<", "&lt;").
-    Replace(">", "&gt;").
-    Replace('"', "&quot;").
-    Replace("'", "&#039;")
+  $escaped = $Value.Replace("&", "&amp;")
+  $escaped = $escaped.Replace("<", "&lt;")
+  $escaped = $escaped.Replace(">", "&gt;")
+  $escaped = $escaped.Replace([string][char]34, "&quot;")
+  $escaped = $escaped.Replace("'", "&#039;")
+  return $escaped
 }
 
 function Get-PostDate {
