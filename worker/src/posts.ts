@@ -108,23 +108,26 @@ export function buildMarkdown(
   return `---\n${frontMatter}\n---\n\n${input.content.replace(/^\n+/, "").replace(/\s+$/, "")}\n`;
 }
 
-export function validatePostInput(value: unknown, defaultDate: string): Required<PostInput> {
+export function validatePostInput(value: unknown, defaultDate: string, existingSlug = ""): Required<PostInput> {
   if (!value || typeof value !== "object") {
     throw new ApiError(400, "INVALID_POST", "Post data is required.");
   }
   const raw = value as Partial<PostInput>;
   const title = typeof raw.title === "string" ? raw.title.trim() : "";
-  const slug = typeof raw.slug === "string" ? sanitizeSlug(raw.slug) : "";
   const description = typeof raw.description === "string" ? raw.description.trim() : "";
   const location = typeof raw.location === "string" ? raw.location.trim() : "";
   const cover = typeof raw.cover === "string" ? raw.cover.trim() : "";
   const content = typeof raw.content === "string" ? raw.content : "";
   const date = typeof raw.date === "string" && raw.date ? raw.date : defaultDate;
+  const requestedSlug = typeof raw.slug === "string" ? raw.slug.trim() : "";
+  const slug = requestedSlug
+    ? sanitizeSlug(requestedSlug)
+    : existingSlug || sanitizeSlug(title) || `post-${date.replace(/-/g, "")}-${crypto.randomUUID().slice(0, 6)}`;
 
   if (!title || title.length > MAX_TITLE_LENGTH) {
     throw new ApiError(400, "INVALID_TITLE", `Title is required and must be at most ${MAX_TITLE_LENGTH} characters.`);
   }
-  if (!slug) {
+  if (requestedSlug && !slug) {
     throw new ApiError(400, "INVALID_SLUG", "Slug must contain letters, numbers, or hyphens.");
   }
   if (description.length > MAX_DESCRIPTION_LENGTH) {
@@ -217,19 +220,19 @@ export class PostService {
     return this.find(slug);
   }
 
-  async create(value: unknown, today = new Date().toISOString().slice(0, 10)): Promise<GitHubCommitResult & { path: string }> {
+  async create(value: unknown, today = new Date().toISOString().slice(0, 10)): Promise<GitHubCommitResult & { path: string; slug: string }> {
     const input = validatePostInput(value, today);
     const exists = (await this.files()).some((file) => slugFromFilename(file.name) === input.slug);
     if (exists) throw new ApiError(409, "POST_EXISTS", "A post with this slug already exists.");
 
     const path = `${this.postsDirectory}/${input.date}-${input.slug}.md`;
     const result = await this.github.putFile(path, buildMarkdown(input), `Publish post: ${input.title}`);
-    return { ...result, path };
+    return { ...result, path, slug: input.slug };
   }
 
   async update(slug: string, value: unknown): Promise<GitHubCommitResult & { path: string }> {
     const current = await this.find(slug);
-    const input = validatePostInput(value, current.date);
+    const input = validatePostInput(value, current.date, current.slug);
     if (input.slug !== current.slug) {
       throw new ApiError(409, "SLUG_IMMUTABLE", "The slug cannot be changed after publication. Create a new post instead.");
     }

@@ -38,3 +38,14 @@ test("post validation enforces date and slug", () => {
     /real date/,
   );
 });
+
+test("post validation generates a slug when the optional field is empty", () => {
+  assert.equal(
+    validatePostInput({ title: "My First Post", slug: "", content: "" }, "2026-09-17").slug,
+    "my-first-post",
+  );
+  assert.match(
+    validatePostInput({ title: "中文标题", content: "" }, "2026-09-17").slug,
+    /^post-20260917-[a-f0-9]{6}$/,
+  );
+});

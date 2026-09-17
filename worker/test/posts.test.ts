@@ -45,6 +45,7 @@ test("post creation writes a dated Markdown file", async () => {
   const service = new PostService(github, "_posts");
   const result = await service.create(input, "2026-09-17");
   assert.equal(result.path, "_posts/2026-09-17-hello.md");
+  assert.equal(result.slug, "hello");
   assert.equal(github.lastPut?.message, "Publish post: Hello");
   assert.equal(github.lastPut?.sha, undefined);
 });

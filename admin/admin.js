@@ -163,12 +163,9 @@
     const publishButtons = document.querySelectorAll('button[type="submit"]');
     const requestedSlug = new URLSearchParams(location.search).get("slug");
     let currentSlug = requestedSlug;
-    let slugTouched = Boolean(requestedSlug);
-    const slugSuffix = crypto.randomUUID().slice(0, 6);
 
     date.value = localDate();
     const updatePreview = () => { preview.innerHTML = window.BlogMarkdown.render(content.value); };
-    const suggestedSlug = () => slugify(title.value) || `post-${date.value.replace(/-/g, "")}-${slugSuffix}`;
     const updateCoverPreview = () => {
       const value = cover.value.trim();
       if (!value) {
@@ -180,9 +177,7 @@
       coverPreview.hidden = false;
     };
     content.addEventListener("input", updatePreview);
-    title.addEventListener("input", () => { if (!slugTouched) slug.value = suggestedSlug(); });
-    date.addEventListener("change", () => { if (!slugTouched) slug.value = suggestedSlug(); });
-    slug.addEventListener("input", () => { slugTouched = true; slug.value = slugify(slug.value); });
+    slug.addEventListener("input", () => { slug.value = slugify(slug.value); });
     cover.addEventListener("input", updateCoverPreview);
     updatePreview();
 
@@ -263,7 +258,8 @@
       try {
         const result = currentSlug ? await api.updatePost(currentSlug, post) : await api.createPost(post);
         if (!currentSlug) {
-          currentSlug = post.slug;
+          currentSlug = result.slug;
+          slug.value = result.slug;
           slug.readOnly = true;
           document.querySelector("#slug-help").textContent = "文章发布后不能修改链接。";
           deleteButton.hidden = false;
