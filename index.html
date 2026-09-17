@@ -1,3 +1,5 @@
+---
+---
 <!doctype html>
 <html lang="en">
 <head>
@@ -338,6 +340,16 @@
       background: var(--surface);
     }
 
+    .post-link {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .post-link:hover .post {
+      border-color: var(--accent);
+      box-shadow: 7px 7px 0 var(--accent-soft);
+    }
+
     .post h3 {
       margin-bottom: 12px;
       font-family: Georgia, "Times New Roman", serif;
@@ -594,19 +606,28 @@
           <h2>Public notes</h2>
         </div>
         <p>
-          Synced from the public entries available in my local blog archive at D:\blog.
+          Notes are written in Markdown and published through GitHub Pages.
         </p>
       </div>
 
       <div class="blog-grid">
-        <!-- BLOG_POSTS_START -->
+        {% for post in site.posts limit:4 %}
+        <a class="post-link" href="{{ post.url | relative_url }}">
+          <article class="post">
+            <div class="meta">{{ post.date | date: "%Y-%m-%d" }}{% if post.location %} · {{ post.location | escape }}{% endif %}</div>
+            <h3>{{ post.title | escape }}</h3>
+            <p class="post-content">{{ post.description | default: post.excerpt | strip_html | normalize_whitespace | truncate: 180 }}</p>
+            <div class="post-footer"><span class="tag">Public</span><span>Read article</span></div>
+          </article>
+        </a>
+        {% else %}
         <article class="post">
-          <div class="meta">2026-09-14 · Beijing Haidian</div>
-          <h3>主页开通！！！</h3>
-          <p class="post-content">撒花！！！</p>
-          <div class="post-footer"><span class="tag">Public</span><span>From local blog</span></div>
+          <div class="meta">No public posts yet</div>
+          <h3>Blog</h3>
+          <p class="post-content">Published notes will appear here.</p>
+          <div class="post-footer"><span class="tag">Public</span></div>
         </article>
-        <!-- BLOG_POSTS_END -->
+        {% endfor %}
       </div>
     </section>
   </main>

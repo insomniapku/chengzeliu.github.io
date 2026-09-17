@@ -1,0 +1,52 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "chengzeliu-blog-api",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-09-01",
+
+  "workers_dev": false,
+
+  "routes": [
+    {
+      "pattern": "api.chengzeliu.com",
+      "custom_domain": true
+    }
+  ],
+
+  "vars": {
+    "ENVIRONMENT": "production",
+    "GITHUB_OWNER": "insomniapku",
+    "GITHUB_REPO": "chengzeliu.github.io",
+    "GITHUB_BRANCH": "main",
+    "POSTS_DIRECTORY": "_posts",
+    "PUBLIC_IMAGE_BASE_URL": "https://img.chengzeliu.com",
+    "ALLOWED_ORIGINS": "https://chengzeliu.com,https://www.chengzeliu.com"
+  },
+
+  "r2_buckets": [
+    {
+      "binding": "BLOG_IMAGES",
+      "bucket_name": "chengzeliu-blog-images"
+    }
+  ],
+
+  "ratelimits": [
+    {
+      "name": "LOGIN_RATE_LIMITER",
+      "namespace_id": "1001",
+      "simple": {
+        "limit": 5,
+        "period": 60
+      }
+    },
+    {
+      "name": "WRITE_RATE_LIMITER",
+      "namespace_id": "1002",
+      "simple": {
+        "limit": 30,
+        "period": 60
+      }
+    }
+  ]
+}
+

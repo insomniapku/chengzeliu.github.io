@@ -1,0 +1,4 @@
+GITHUB_TOKEN=replace-with-a-fine-grained-token
+ADMIN_PASSWORD_HASH=pbkdf2-sha256$310000$replace-salt$replace-hash
+SESSION_SECRET=replace-with-at-least-32-random-characters
+

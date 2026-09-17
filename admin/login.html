@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex,nofollow" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src https://api.chengzeliu.com http://127.0.0.1:8787 http://localhost:8787; img-src 'self' https://img.chengzeliu.com data: blob:; style-src 'self'; script-src 'self'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'" />
+  <title>Sign in | Blog Admin</title>
+  <link rel="stylesheet" href="admin.css" />
+  <script src="api.js" defer></script>
+  <script src="admin.js" defer></script>
+</head>
+<body data-page="login">
+  <main class="auth-shell">
+    <section class="auth-card" aria-labelledby="login-title">
+      <a class="brand" href="/">CL</a>
+      <p class="eyebrow">Private access</p>
+      <h1 id="login-title">Blog Admin</h1>
+      <p class="muted">Sign in to write and publish Markdown posts.</p>
+      <div id="message" class="notice" role="status" aria-live="polite" hidden></div>
+      <form id="login-form" class="stack">
+        <label>
+          <span>Password</span>
+          <input id="password" name="password" type="password" autocomplete="current-password" required autofocus />
+        </label>
+        <button class="button primary" type="submit">Sign in</button>
+      </form>
+    </section>
+  </main>
+</body>
+</html>
+

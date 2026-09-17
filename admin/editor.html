@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex,nofollow" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src https://api.chengzeliu.com http://127.0.0.1:8787 http://localhost:8787; img-src 'self' https://img.chengzeliu.com data: blob:; style-src 'self'; script-src 'self'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'" />
+  <title>Editor | Blog Admin</title>
+  <link rel="stylesheet" href="admin.css" />
+  <script src="api.js" defer></script>
+  <script src="markdown.js" defer></script>
+  <script src="admin.js" defer></script>
+</head>
+<body data-page="editor">
+  <header class="app-header">
+    <div class="app-shell header-row">
+      <a class="brand" href="/admin/">CL</a>
+      <nav class="header-actions" aria-label="Editor navigation">
+        <a href="/admin/">All posts</a>
+        <button id="logout" class="text-button" type="button">Sign out</button>
+      </nav>
+    </div>
+  </header>
+  <main class="wide-shell page">
+    <div class="title-row compact">
+      <div>
+        <p class="eyebrow">Markdown editor</p>
+        <h1 id="editor-title">New post</h1>
+      </div>
+      <div class="button-row">
+        <button id="delete-post" class="button danger" type="button" hidden>Delete</button>
+        <button class="button primary" type="submit" form="post-form">Publish</button>
+      </div>
+    </div>
+    <div id="message" class="notice" role="status" aria-live="polite" hidden></div>
+    <form id="post-form" class="editor-form">
+      <section class="metadata-card" aria-label="Post details">
+        <label class="span-two">
+          <span>Title</span>
+          <input id="title" name="title" maxlength="180" required />
+        </label>
+        <label>
+          <span>Slug</span>
+          <input id="slug" name="slug" maxlength="100" pattern="[a-z0-9-]+" required />
+          <small id="slug-help">Letters, numbers, and hyphens.</small>
+        </label>
+        <label>
+          <span>Date</span>
+          <input id="date" name="date" type="date" required />
+        </label>
+        <label class="span-two">
+          <span>Description</span>
+          <textarea id="description" name="description" rows="2" maxlength="500"></textarea>
+        </label>
+        <label class="span-two">
+          <span>Cover image URL</span>
+          <input id="cover" name="cover" type="url" inputmode="url" placeholder="https://img.chengzeliu.com/…" />
+        </label>
+      </section>
+
+      <section class="workspace" aria-label="Post content and preview">
+        <div class="editor-pane">
+          <div class="pane-header">
+            <strong>Markdown</strong>
+            <label class="upload-button">
+              <span>Upload image</span>
+              <input id="image-file" type="file" accept="image/jpeg,image/png,image/webp,image/gif" />
+            </label>
+          </div>
+          <textarea id="content" name="content" class="markdown-input" aria-label="Markdown content" spellcheck="true" placeholder="# Start writing…"></textarea>
+          <p class="drop-hint">Drop a JPEG, PNG, WebP, or GIF here. Maximum 8 MiB.</p>
+        </div>
+        <div class="preview-pane">
+          <div class="pane-header"><strong>Preview</strong><span>Raw HTML is disabled</span></div>
+          <article id="preview" class="markdown-preview"></article>
+        </div>
+      </section>
+    </form>
+  </main>
+</body>
+</html>
+

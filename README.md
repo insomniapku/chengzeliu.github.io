@@ -1,14 +1,15 @@
 # chengzeliu.github.io
-personal page
 
-## Sync blog posts
+Personal homepage and Markdown blog for [chengzeliu.com](https://chengzeliu.com), published by GitHub Pages.
 
-After writing public posts in the local blog at `D:\blog`, run:
+- Public posts live in `_posts/` and are rendered by Jekyll.
+- The private editor lives at `/admin/`.
+- The Cloudflare Worker API lives in `worker/`.
+- Images are stored in Cloudflare R2.
 
-```powershell
-.\sync-blog-to-homepage.ps1
-```
+See [BLOG_ADMIN.md](BLOG_ADMIN.md) for setup, secrets, deployment, and testing.
 
-On Windows, you can also double-click `sync-blog-to-homepage.bat`.
+## Legacy local blog import
 
-The script reads public posts from `D:\blog\data\posts.json`, updates the Blog section in `index.html`, commits the change, and pushes it to GitHub.
+The optional `sync-blog-to-homepage.ps1` script now imports only public entries from
+`D:\blog\data\posts.json` into `_posts/`. It no longer rewrites `index.html`.

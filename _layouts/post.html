@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="{{ page.description | default: page.excerpt | strip_html | normalize_whitespace | escape }}" />
+  <title>{{ page.title | escape }} | Chengze Liu</title>
+  <style>
+    :root {
+      --ink: #1f2428;
+      --muted: #687076;
+      --line: #d9e0df;
+      --paper: #f7f8f4;
+      --surface: #ffffff;
+      --accent: #176f76;
+      --accent-soft: #dcefee;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background:
+        linear-gradient(90deg, rgba(23, 111, 118, 0.05) 1px, transparent 1px),
+        linear-gradient(180deg, rgba(23, 111, 118, 0.05) 1px, transparent 1px),
+        var(--paper);
+      background-size: 44px 44px;
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.75;
+    }
+
+    a { color: var(--accent); }
+    .shell { width: min(820px, calc(100% - 40px)); margin: 0 auto; }
+    header {
+      border-bottom: 1px solid var(--line);
+      background: rgba(247, 248, 244, 0.92);
+    }
+    nav {
+      min-height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+    nav a { color: var(--ink); text-decoration: none; }
+    .brand { font-family: Georgia, "Times New Roman", serif; font-size: 21px; }
+    .back { color: var(--muted); font-size: 14px; }
+    article {
+      margin: 56px auto 80px;
+      padding: clamp(26px, 6vw, 58px);
+      border: 1px solid var(--line);
+      background: var(--surface);
+    }
+    .eyebrow {
+      margin: 0 0 14px;
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+    h1, h2, h3 { font-family: Georgia, "Times New Roman", serif; font-weight: 500; line-height: 1.18; }
+    h1 { margin: 0 0 18px; font-size: clamp(40px, 8vw, 68px); }
+    h2 { margin-top: 2em; font-size: 30px; }
+    h3 { margin-top: 1.8em; font-size: 23px; }
+    .meta { margin-bottom: 40px; color: var(--muted); font-size: 14px; }
+    .cover { width: 100%; max-height: 480px; margin: 0 0 36px; object-fit: cover; }
+    .content { font-size: 17px; }
+    .content img { max-width: 100%; height: auto; }
+    .content pre {
+      overflow-x: auto;
+      padding: 18px;
+      background: #172023;
+      color: #f4f7f5;
+      font-size: 14px;
+    }
+    .content code { padding: 2px 5px; background: var(--accent-soft); font-size: 0.9em; }
+    .content pre code { padding: 0; background: transparent; }
+    blockquote { margin-left: 0; padding-left: 20px; border-left: 3px solid var(--accent); color: #465055; }
+    hr { border: 0; border-top: 1px solid var(--line); }
+  </style>
+</head>
+<body>
+  <header>
+    <nav class="shell" aria-label="Blog navigation">
+      <a class="brand" href="/">Chengze Liu</a>
+      <a class="back" href="/blog/">All posts</a>
+    </nav>
+  </header>
+  <main class="shell">
+    <article>
+      <p class="eyebrow">Research notes</p>
+      <h1>{{ page.title | escape }}</h1>
+      <p class="meta"><time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: "%Y-%m-%d" }}</time>{% if page.location %} · {{ page.location | escape }}{% endif %}</p>
+      {% if page.cover %}<img class="cover" src="{{ page.cover | escape }}" alt="" />{% endif %}
+      <div class="content">{{ content }}</div>
+    </article>
+  </main>
+</body>
+</html>
+

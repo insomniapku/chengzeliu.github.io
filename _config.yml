@@ -1,0 +1,15 @@
+title: Chengze Liu
+description: Robotics, robot learning, and research notes.
+url: "https://chengzeliu.com"
+baseurl: ""
+timezone: Asia/Shanghai
+markdown: kramdown
+permalink: /blog/:slug/
+
+exclude:
+  - BLOG_ADMIN.md
+  - README.md
+  - worker
+  - sync-blog-to-homepage.bat
+  - sync-blog-to-homepage.ps1
+

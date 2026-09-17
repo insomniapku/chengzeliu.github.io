@@ -1,136 +1,89 @@
 $ErrorActionPreference = "Stop"
 
 $homepageDir = Split-Path -Parent $MyInvocation.MyCommand.Path
-$indexPath = Join-Path $homepageDir "index.html"
+$postsDir = Join-Path $homepageDir "_posts"
 $blogDataPath = "D:\blog\data\posts.json"
 
-function Escape-Html {
-  param([AllowNull()][string]$Value)
+function ConvertTo-Slug {
+  param([string]$Value)
 
-  if ($null -eq $Value) {
-    return ""
+  $normalized = $Value.Normalize([Text.NormalizationForm]::FormD).ToLowerInvariant()
+  $slug = [regex]::Replace($normalized, "[^a-z0-9]+", "-").Trim("-")
+  if ($slug.Length -gt 100) {
+    $slug = $slug.Substring(0, 100).TrimEnd("-")
   }
-
-  $escaped = $Value.Replace("&", "&amp;")
-  $escaped = $escaped.Replace("<", "&lt;")
-  $escaped = $escaped.Replace(">", "&gt;")
-  $escaped = $escaped.Replace([string][char]34, "&quot;")
-  $escaped = $escaped.Replace("'", "&#039;")
-  return $escaped
+  return $slug
 }
 
-function Get-PostDate {
-  param($Post)
-
-  if ($Post.title -match "^\d{8}$") {
-    return "{0}-{1}-{2}" -f $Post.title.Substring(0, 4), $Post.title.Substring(4, 2), $Post.title.Substring(6, 2)
-  }
-
-  return ([datetime]$Post.createdAt).ToLocalTime().ToString("yyyy-MM-dd")
+function ConvertTo-YamlString {
+  param([AllowEmptyString()][string]$Value)
+  return ($Value | ConvertTo-Json -Compress)
 }
 
-function Get-LocationLabel {
-  param($Post)
-
-  $location = $Post.location
-  if ([string]::IsNullOrWhiteSpace($location)) {
-    $location = $Post.ipCity
-  }
-
-  if ([string]::IsNullOrWhiteSpace($location)) {
-    return "Location not specified"
-  }
-
-  if ($location -eq "北京市海淀区") {
-    return "Beijing Haidian"
-  }
-
-  return $location
-}
-
-if (-not (Test-Path $blogDataPath)) {
+if (-not (Test-Path -LiteralPath $blogDataPath)) {
   throw "Cannot find blog data at $blogDataPath"
 }
 
-if (-not (Test-Path $indexPath)) {
-  throw "Cannot find homepage file at $indexPath"
-}
+New-Item -ItemType Directory -Force -Path $postsDir | Out-Null
+$allPosts = @(Get-Content -LiteralPath $blogDataPath -Raw -Encoding UTF8 | ConvertFrom-Json)
+$posts = @($allPosts | Where-Object { $_.visibility -eq "public" })
 
-$allPosts = @(Get-Content $blogDataPath -Raw -Encoding UTF8 | ConvertFrom-Json)
-$posts = @($allPosts |
-  Where-Object { $_.visibility -eq "public" } |
-  Sort-Object { [datetime]$_.createdAt } -Descending)
-
-$cards = @(
 foreach ($post in $posts) {
-  $date = Escape-Html (Get-PostDate $post)
-  $location = Escape-Html (Get-LocationLabel $post)
-  $title = Escape-Html ($(if ([string]::IsNullOrWhiteSpace($post.title)) { "Untitled" } else { $post.title }))
-  $content = Escape-Html $post.content
+  $date = ([datetime]$post.createdAt).ToLocalTime().ToString("yyyy-MM-dd")
+  $existing = Get-ChildItem -LiteralPath $postsDir -Filter "*.md" -File |
+    Where-Object { Select-String -LiteralPath $_.FullName -SimpleMatch "source_id: `"$($post.id)`"" -Quiet } |
+    Select-Object -First 1
 
-@"
-        <article class="post">
-          <div class="meta">$date · $location</div>
-          <h3>$title</h3>
-          <p class="post-content">$content</p>
-          <div class="post-footer"><span class="tag">Public</span><span>From local blog</span></div>
-        </article>
-"@
+  if ($existing) {
+    $target = $existing.FullName
+    $slug = $existing.BaseName.Substring(11)
+  }
+  else {
+    $slug = ConvertTo-Slug $post.title
+    if ([string]::IsNullOrWhiteSpace($slug)) {
+      $slug = "local-" + $post.id.Substring(0, 8)
+    }
+    $target = Join-Path $postsDir "$date-$slug.md"
+  }
+
+  $description = (($post.content -split "`r?`n" | Select-Object -First 1) -join " ").Trim()
+  if ($description.Length -gt 160) {
+    $description = $description.Substring(0, 157) + "..."
+  }
+  $location = if ([string]::IsNullOrWhiteSpace($post.location)) { $post.ipCity } else { $post.location }
+
+  $frontMatter = @(
+    "---"
+    "layout: post"
+    "title: $(ConvertTo-YamlString $post.title)"
+    "date: $date"
+    "slug: $slug"
+    "description: $(ConvertTo-YamlString $description)"
+    "location: $(ConvertTo-YamlString $location)"
+    "source_id: $(ConvertTo-YamlString $post.id)"
+    "---"
+    ""
+    ""
+  ) -join "`n"
+  $markdown = $frontMatter + ($post.content.Trim() -replace "`r`n", "`n") + "`n"
+  Set-Content -LiteralPath $target -Value $markdown -Encoding UTF8
 }
-)
-
-if ($cards.Count -eq 0) {
-  $cards = @"
-        <article class="post">
-          <div class="meta">No public posts yet</div>
-          <h3>Blog</h3>
-          <p class="post-content">Public posts from the local blog will appear here.</p>
-          <div class="post-footer"><span class="tag">Public</span><span>From local blog</span></div>
-        </article>
-"@
-}
-
-$content = Get-Content $indexPath -Raw -Encoding UTF8
-$startMarker = "<!-- BLOG_POSTS_START -->"
-$endMarker = "<!-- BLOG_POSTS_END -->"
-
-if (-not $content.Contains($startMarker) -or -not $content.Contains($endMarker)) {
-  throw "Cannot find blog sync markers in index.html"
-}
-
-$replacement = @"
-        <!-- BLOG_POSTS_START -->
-$($cards -join "`r`n`r`n")
-        <!-- BLOG_POSTS_END -->
-"@
-
-$pattern = "(?s)\s*<!-- BLOG_POSTS_START -->.*?<!-- BLOG_POSTS_END -->"
-$updated = [regex]::Replace($content, $pattern, "`r`n$replacement", 1)
-Set-Content $indexPath $updated -Encoding UTF8
 
 Push-Location $homepageDir
 try {
-  git add index.html | Out-Null
-
+  git add _posts | Out-Null
   git diff --cached --quiet
   if ($LASTEXITCODE -eq 0) {
-    Write-Host "Homepage blog is already up to date."
+    Write-Host "Markdown posts are already up to date."
     exit 0
   }
 
-  $message = "Sync blog posts " + (Get-Date -Format "yyyy-MM-dd HH:mm")
+  $message = "Import public blog posts " + (Get-Date -Format "yyyy-MM-dd HH:mm")
   git commit -m $message
-  if ($LASTEXITCODE -ne 0) {
-    throw "Git commit failed. Please check the message above."
-  }
-
+  if ($LASTEXITCODE -ne 0) { throw "Git commit failed. Please check the message above." }
   git push origin main
-  if ($LASTEXITCODE -ne 0) {
-    throw "Blog posts were synced locally, but upload to GitHub failed. Please check your network and run this script again."
-  }
-
-  Write-Host ""
-  Write-Host "Done. Public blog posts have been synced and uploaded to GitHub."
+  if ($LASTEXITCODE -ne 0) { throw "Posts were imported locally, but upload to GitHub failed." }
+  Write-Host "Done. Public local entries are now Markdown posts in _posts."
 }
 finally {
   Pop-Location
