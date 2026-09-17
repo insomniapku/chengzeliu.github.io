@@ -3,6 +3,7 @@ import { ApiError, base64ToBytes, fromBase64Url, requiredConfig, toBase64Url } f
 
 export const SESSION_COOKIE = "blog_admin_session";
 const SESSION_SECONDS = 8 * 60 * 60;
+const PBKDF2_ITERATIONS = 100_000;
 
 function constantTimeEqual(left: Uint8Array, right: Uint8Array): boolean {
   if (left.byteLength !== right.byteLength) return false;
@@ -19,7 +20,7 @@ export async function verifyPassword(password: string, encodedHash: string): Pro
   if (
     algorithm !== "pbkdf2-sha256" ||
     !Number.isInteger(iterations) ||
-    iterations < 210_000 ||
+    iterations !== PBKDF2_ITERATIONS ||
     !saltText ||
     !hashText ||
     extra.length > 0
@@ -43,11 +44,16 @@ export async function verifyPassword(password: string, encodedHash: string): Pro
     false,
     ["deriveBits"],
   );
-  const derived = await crypto.subtle.deriveBits(
-    { name: "PBKDF2", hash: "SHA-256", salt: salt as BufferSource, iterations },
-    passwordKey,
-    expected.byteLength * 8,
-  );
+  let derived: ArrayBuffer;
+  try {
+    derived = await crypto.subtle.deriveBits(
+      { name: "PBKDF2", hash: "SHA-256", salt: salt as BufferSource, iterations },
+      passwordKey,
+      expected.byteLength * 8,
+    );
+  } catch {
+    throw new ApiError(500, "SERVER_MISCONFIGURED", "ADMIN_PASSWORD_HASH cannot be verified by this runtime.");
+  }
   return constantTimeEqual(new Uint8Array(derived), expected);
 }
 
@@ -124,4 +130,3 @@ export function clearSessionCookie(env: Env): string {
   const secure = env.ENVIRONMENT === "production" ? "; Secure" : "";
   return `${SESSION_COOKIE}=; Path=/api; HttpOnly${secure}; SameSite=Strict; Max-Age=0`;
 }
-

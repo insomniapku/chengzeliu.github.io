@@ -40,7 +40,7 @@ function readPassword() {
 try {
   const password = await readPassword();
   if (password.length < 12) throw new Error("Use a password with at least 12 characters.");
-  const iterations = 310000;
+  const iterations = 100000;
   const salt = randomBytes(16);
   const hash = pbkdf2Sync(password, salt, iterations, 32, "sha256");
   process.stdout.write(`pbkdf2-sha256$${iterations}$${salt.toString("base64")}$${hash.toString("base64")}\n`);
@@ -48,4 +48,3 @@ try {
   process.stderr.write(`${error instanceof Error ? error.message : "Could not create password hash."}\n`);
   process.exitCode = 1;
 }
-

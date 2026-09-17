@@ -5,7 +5,7 @@ import { handleRequest } from "../src/index";
 import { testEnv } from "./helpers";
 
 async function passwordHash(password: string): Promise<string> {
-  const iterations = 210000;
+  const iterations = 100000;
   const salt = new TextEncoder().encode("0123456789abcdef");
   const key = await crypto.subtle.importKey("raw", new TextEncoder().encode(password), "PBKDF2", false, ["deriveBits"]);
   const bits = await crypto.subtle.deriveBits(
