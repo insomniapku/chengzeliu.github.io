@@ -8,7 +8,8 @@
     "deploy": "wrangler deploy",
     "typecheck": "tsc --noEmit",
     "test": "tsx --test test/**/*.test.ts",
-    "hash-password": "node scripts/hash-password.mjs"
+    "hash-password": "node scripts/hash-password.mjs",
+    "set-password": "node scripts/hash-password.mjs --set-secret"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^5.20260917.1",

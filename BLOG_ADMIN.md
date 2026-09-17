@@ -99,6 +99,12 @@ npm run hash-password
 
 脚本会要求输入至少 12 个字符的密码，并输出使用 100,000 次迭代的 PBKDF2-SHA256 hash（Cloudflare Workers Web Crypto 当前支持的上限）。把输出作为 `ADMIN_PASSWORD_HASH`，不要把明文密码或 hash 写入 Git；建议使用至少 16 位的随机密码。
 
+也可以直接安全地生成 Hash 并写入 Cloudflare Secret，过程中不会显示明文密码或 Hash：
+
+```powershell
+npm run set-password
+```
+
 生成 session secret 的一种方式：
 
 ```powershell
