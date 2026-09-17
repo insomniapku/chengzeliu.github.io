@@ -34,6 +34,7 @@ const input = {
   title: "Hello",
   slug: "hello",
   description: "A post",
+  location: "Beijing Haidian",
   cover: "",
   content: "# Hello",
   date: "2026-09-17",
@@ -60,4 +61,3 @@ test("post update and deletion use the file current SHA", async () => {
   assert.equal(github.lastDelete?.sha, "new-file-sha");
   assert.equal(github.lastDelete?.message, "Delete post: Hello");
 });
-

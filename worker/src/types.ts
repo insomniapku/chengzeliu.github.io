@@ -22,6 +22,7 @@ export interface PostInput {
   title: string;
   slug: string;
   description?: string;
+  location?: string;
   cover?: string;
   content: string;
   date?: string;
@@ -29,6 +30,7 @@ export interface PostInput {
 
 export interface StoredPost extends Required<Pick<PostInput, "title" | "slug" | "content">> {
   description: string;
+  location: string;
   cover: string;
   date: string;
   path: string;
@@ -61,4 +63,3 @@ export interface GitHubStorage {
   putFile(path: string, content: string, message: string, sha?: string): Promise<GitHubCommitResult>;
   deleteFile(path: string, sha: string, message: string): Promise<GitHubCommitResult>;
 }
-

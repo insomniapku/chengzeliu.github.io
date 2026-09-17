@@ -1,11 +1,11 @@
 <!doctype html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="robots" content="noindex,nofollow" />
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src https://api.chengzeliu.com http://127.0.0.1:8787 http://localhost:8787; img-src 'self' https://img.chengzeliu.com data: blob:; style-src 'self'; script-src 'self'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'" />
-  <title>Editor | Blog Admin</title>
+  <title>写文章 | 博客后台</title>
   <link rel="stylesheet" href="admin.css" />
   <script src="api.js" defer></script>
   <script src="markdown.js" defer></script>
@@ -15,63 +15,79 @@
   <header class="app-header">
     <div class="app-shell header-row">
       <a class="brand" href="/admin/">CL</a>
-      <nav class="header-actions" aria-label="Editor navigation">
-        <a href="/admin/">All posts</a>
-        <button id="logout" class="text-button" type="button">Sign out</button>
+      <nav class="header-actions" aria-label="编辑器导航">
+        <a href="/admin/">所有文章</a>
+        <button id="logout" class="text-button" type="button">退出登录</button>
       </nav>
     </div>
   </header>
   <main class="wide-shell page">
     <div class="title-row compact">
       <div>
-        <p class="eyebrow">Markdown editor</p>
-        <h1 id="editor-title">New post</h1>
+        <p class="eyebrow">文章编辑器</p>
+        <h1 id="editor-title">写新文章</h1>
       </div>
       <div class="button-row">
-        <button id="delete-post" class="button danger" type="button" hidden>Delete</button>
-        <button class="button primary" type="submit" form="post-form">Publish</button>
+        <button id="delete-post" class="button danger" type="button" hidden>删除文章</button>
+        <button class="button primary" type="submit" form="post-form">发布文章</button>
       </div>
     </div>
     <div id="message" class="notice" role="status" aria-live="polite" hidden></div>
     <form id="post-form" class="editor-form">
-      <section class="metadata-card" aria-label="Post details">
+      <section class="metadata-card" aria-label="文章信息">
         <label class="span-two">
-          <span>Title</span>
-          <input id="title" name="title" maxlength="180" required />
+          <span>标题</span>
+          <input id="title" name="title" maxlength="180" placeholder="输入文章标题" required />
         </label>
         <label>
-          <span>Slug</span>
-          <input id="slug" name="slug" maxlength="100" pattern="[a-z0-9-]+" required />
-          <small id="slug-help">Letters, numbers, and hyphens.</small>
+          <span>地点</span>
+          <input id="location" name="location" maxlength="120" placeholder="例如：北京海淀" />
         </label>
         <label>
-          <span>Date</span>
+          <span>发布日期</span>
           <input id="date" name="date" type="date" required />
         </label>
-        <label class="span-two">
-          <span>Description</span>
-          <textarea id="description" name="description" rows="2" maxlength="500"></textarea>
-        </label>
-        <label class="span-two">
-          <span>Cover image URL</span>
-          <input id="cover" name="cover" type="url" inputmode="url" placeholder="https://img.chengzeliu.com/…" />
-        </label>
+        <div class="cover-field span-two">
+          <label>
+            <span>封面图片</span>
+            <input id="cover" name="cover" type="url" inputmode="url" placeholder="上传图片后会自动填写地址" />
+          </label>
+          <label class="upload-button boxed-upload">
+            <span id="cover-upload-label">选择封面图片</span>
+            <input id="cover-file" type="file" accept="image/jpeg,image/png,image/webp,image/gif" />
+          </label>
+          <img id="cover-preview" class="cover-preview" alt="封面预览" hidden />
+        </div>
+        <details class="advanced-settings span-two">
+          <summary>高级设置</summary>
+          <div class="advanced-grid">
+            <label>
+              <span>文章链接</span>
+              <input id="slug" name="slug" maxlength="100" pattern="[a-z0-9-]+" required />
+              <small id="slug-help">只允许英文字母、数字和连字符；中文标题会自动生成。</small>
+            </label>
+            <label>
+              <span>文章摘要</span>
+              <textarea id="description" name="description" rows="2" maxlength="500" placeholder="用于博客列表，可留空"></textarea>
+            </label>
+          </div>
+        </details>
       </section>
 
-      <section class="workspace" aria-label="Post content and preview">
+      <section class="workspace" aria-label="正文和预览">
         <div class="editor-pane">
           <div class="pane-header">
-            <strong>Markdown</strong>
+            <strong>正文</strong>
             <label class="upload-button">
-              <span>Upload image</span>
+              <span id="content-upload-label">插入正文图片</span>
               <input id="image-file" type="file" accept="image/jpeg,image/png,image/webp,image/gif" />
             </label>
           </div>
-          <textarea id="content" name="content" class="markdown-input" aria-label="Markdown content" spellcheck="true" placeholder="# Start writing…"></textarea>
-          <p class="drop-hint">Drop a JPEG, PNG, WebP, or GIF here. Maximum 8 MiB.</p>
+          <textarea id="content" name="content" class="markdown-input" aria-label="文章正文" spellcheck="true" placeholder="在这里写正文，支持 Markdown…"></textarea>
+          <p class="drop-hint">可以把 JPEG、PNG、WebP 或 GIF 图片拖到这里，最大 8 MiB。</p>
         </div>
         <div class="preview-pane">
-          <div class="pane-header"><strong>Preview</strong><span>Raw HTML is disabled</span></div>
+          <div class="pane-header"><strong>实时预览</strong><span>不会执行原始 HTML</span></div>
           <article id="preview" class="markdown-preview"></article>
         </div>
       </section>
@@ -79,4 +95,3 @@
   </main>
 </body>
 </html>
-

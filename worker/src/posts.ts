@@ -10,6 +10,7 @@ import { ApiError } from "./utils";
 export const MAX_MARKDOWN_BYTES = 512 * 1024;
 const MAX_TITLE_LENGTH = 180;
 const MAX_DESCRIPTION_LENGTH = 500;
+const MAX_LOCATION_LENGTH = 120;
 const MAX_SLUG_LENGTH = 100;
 
 export function sanitizeSlug(value: string): string {
@@ -82,7 +83,7 @@ function serializeScalar(value: unknown): string {
 
 export function buildMarkdown(
   input: Required<Pick<PostInput, "title" | "slug" | "content" | "date">> &
-    Pick<PostInput, "description" | "cover">,
+    Pick<PostInput, "description" | "location" | "cover">,
   existing: Record<string, unknown> = {},
 ): string {
   const attributes: Record<string, unknown> = {
@@ -93,10 +94,12 @@ export function buildMarkdown(
     slug: input.slug,
     description: input.description ?? "",
   };
+  if (input.location) attributes.location = input.location;
+  else delete attributes.location;
   if (input.cover) attributes.cover = input.cover;
   else delete attributes.cover;
 
-  const preferredOrder = ["layout", "title", "date", "slug", "description", "cover"];
+  const preferredOrder = ["layout", "title", "date", "slug", "description", "location", "cover"];
   const keys = [
     ...preferredOrder.filter((key) => key in attributes),
     ...Object.keys(attributes).filter((key) => !preferredOrder.includes(key)).sort(),
@@ -113,6 +116,7 @@ export function validatePostInput(value: unknown, defaultDate: string): Required
   const title = typeof raw.title === "string" ? raw.title.trim() : "";
   const slug = typeof raw.slug === "string" ? sanitizeSlug(raw.slug) : "";
   const description = typeof raw.description === "string" ? raw.description.trim() : "";
+  const location = typeof raw.location === "string" ? raw.location.trim() : "";
   const cover = typeof raw.cover === "string" ? raw.cover.trim() : "";
   const content = typeof raw.content === "string" ? raw.content : "";
   const date = typeof raw.date === "string" && raw.date ? raw.date : defaultDate;
@@ -125,6 +129,9 @@ export function validatePostInput(value: unknown, defaultDate: string): Required
   }
   if (description.length > MAX_DESCRIPTION_LENGTH) {
     throw new ApiError(400, "INVALID_DESCRIPTION", `Description must be at most ${MAX_DESCRIPTION_LENGTH} characters.`);
+  }
+  if (location.length > MAX_LOCATION_LENGTH) {
+    throw new ApiError(400, "INVALID_LOCATION", `Location must be at most ${MAX_LOCATION_LENGTH} characters.`);
   }
   if (!isValidDate(date)) {
     throw new ApiError(400, "INVALID_DATE", "Date must use YYYY-MM-DD and be a real date.");
@@ -144,7 +151,7 @@ export function validatePostInput(value: unknown, defaultDate: string): Required
     }
   }
 
-  return { title, slug, description, cover, content, date };
+  return { title, slug, description, location, cover, content, date };
 }
 
 function slugFromFilename(name: string): string | null {
@@ -175,6 +182,7 @@ export class PostService {
       title: stringAttribute(parsed.attributes, "title") || filenameSlug,
       slug: stringAttribute(parsed.attributes, "slug") || filenameSlug,
       description: stringAttribute(parsed.attributes, "description"),
+      location: stringAttribute(parsed.attributes, "location"),
       cover: stringAttribute(parsed.attributes, "cover"),
       date: stringAttribute(parsed.attributes, "date") || file.name.slice(0, 10),
       content: parsed.content,
@@ -246,4 +254,3 @@ export class PostService {
     return { ...result, path: current.path };
   }
 }
-

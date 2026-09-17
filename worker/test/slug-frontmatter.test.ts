@@ -14,6 +14,7 @@ test("front matter generation round-trips and preserves extra fields", () => {
       title: "A title",
       slug: "a-title",
       description: "A description",
+      location: "Beijing Haidian",
       cover: "https://img.example.com/a.png",
       content: "# Hello\n\nBody",
       date: "2026-09-17",
@@ -22,6 +23,7 @@ test("front matter generation round-trips and preserves extra fields", () => {
   );
   const parsed = parseFrontMatter(markdown);
   assert.equal(parsed.attributes.title, "A title");
+  assert.equal(parsed.attributes.location, "Beijing Haidian");
   assert.deepEqual(parsed.attributes.tags, ["robotics", "notes"]);
   assert.equal(parsed.content, "# Hello\n\nBody\n");
 });
@@ -36,4 +38,3 @@ test("post validation enforces date and slug", () => {
     /real date/,
   );
 });
-

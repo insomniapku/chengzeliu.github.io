@@ -22,20 +22,20 @@
     try {
       response = await fetch(`${baseUrl}${path}`, { ...options, headers, credentials: "include" });
     } catch {
-      throw new ApiError(0, "NETWORK_ERROR", "Could not reach the blog API. Check your connection and try again.");
+      throw new ApiError(0, "NETWORK_ERROR", "无法连接博客服务，请检查网络后重试。");
     }
 
     let payload;
     try {
       payload = await response.json();
     } catch {
-      throw new ApiError(response.status, "INVALID_RESPONSE", "The blog API returned an unreadable response.");
+      throw new ApiError(response.status, "INVALID_RESPONSE", "博客服务返回了无法读取的响应。");
     }
     if (!response.ok || !payload.ok) {
       throw new ApiError(
         response.status,
         payload.error?.code || "API_ERROR",
-        payload.error?.message || "The request could not be completed.",
+        payload.error?.message || "操作未能完成。",
       );
     }
     return payload.data;

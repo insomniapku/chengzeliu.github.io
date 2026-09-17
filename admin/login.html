@@ -1,11 +1,11 @@
 <!doctype html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="robots" content="noindex,nofollow" />
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src https://api.chengzeliu.com http://127.0.0.1:8787 http://localhost:8787; img-src 'self' https://img.chengzeliu.com data: blob:; style-src 'self'; script-src 'self'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'" />
-  <title>Sign in | Blog Admin</title>
+  <title>登录 | 博客后台</title>
   <link rel="stylesheet" href="admin.css" />
   <script src="api.js" defer></script>
   <script src="admin.js" defer></script>
@@ -14,19 +14,18 @@
   <main class="auth-shell">
     <section class="auth-card" aria-labelledby="login-title">
       <a class="brand" href="/">CL</a>
-      <p class="eyebrow">Private access</p>
-      <h1 id="login-title">Blog Admin</h1>
-      <p class="muted">Sign in to write and publish Markdown posts.</p>
+      <p class="eyebrow">管理员入口</p>
+      <h1 id="login-title">博客后台</h1>
+      <p class="muted">登录后即可撰写、预览和发布文章。</p>
       <div id="message" class="notice" role="status" aria-live="polite" hidden></div>
       <form id="login-form" class="stack">
         <label>
-          <span>Password</span>
+          <span>管理员密码</span>
           <input id="password" name="password" type="password" autocomplete="current-password" required autofocus />
         </label>
-        <button class="button primary" type="submit">Sign in</button>
+        <button class="button primary" type="submit">登录</button>
       </form>
     </section>
   </main>
 </body>
 </html>
-

@@ -4,6 +4,30 @@
   const api = window.BlogApi;
   const page = document.body.dataset.page;
   const message = document.querySelector("#message");
+  const errorMessages = {
+    NETWORK_ERROR: "无法连接博客服务，请检查网络后重试。",
+    INVALID_CREDENTIALS: "管理员密码不正确。",
+    UNAUTHORIZED: "登录已过期，请重新登录。",
+    RATE_LIMITED: "操作太频繁，请稍后再试。",
+    GITHUB_UNAVAILABLE: "暂时无法连接 GitHub，请稍后再试。",
+    GITHUB_API_ERROR: "GitHub 拒绝了这次操作，请检查 Token 权限。",
+    GITHUB_CONFLICT: "文章已在其他地方发生变化，请刷新后重试。",
+    POST_EXISTS: "这个文章链接已经存在，请换一个。",
+    POST_NOT_FOUND: "没有找到这篇文章。",
+    INVALID_TITLE: "请填写标题，且不要超过 180 个字符。",
+    INVALID_DESCRIPTION: "文章摘要不能超过 500 个字符。",
+    INVALID_DATE: "请选择有效的发布日期。",
+    INVALID_COVER_URL: "封面图片地址必须是有效的 HTTPS 地址。",
+    INVALID_LOCATION: "地点不能超过 120 个字符。",
+    INVALID_SLUG: "文章链接只能包含英文字母、数字和连字符。",
+    SLUG_IMMUTABLE: "文章发布后不能修改链接。",
+    MARKDOWN_TOO_LARGE: "正文超过 512 KiB 限制。",
+    IMAGE_TOO_LARGE: "图片不能超过 8 MiB。",
+    UNSUPPORTED_IMAGE_TYPE: "只支持 JPEG、PNG、WebP 和 GIF 图片。",
+    IMAGE_TYPE_MISMATCH: "图片内容与文件类型不一致。",
+    EMPTY_IMAGE: "请选择一个非空图片文件。",
+    R2_UPLOAD_ERROR: "图片上传失败，请稍后重试。",
+  };
 
   function showMessage(text, type = "error") {
     if (!message) return;
@@ -22,7 +46,7 @@
       location.replace("/admin/login.html");
       return;
     }
-    showMessage(error?.message || "Something went wrong. Please try again.");
+    showMessage(errorMessages[error?.code] || error?.message || "操作失败，请稍后重试。");
   }
 
   async function requireSession() {
@@ -60,14 +84,14 @@
       clearMessage();
       const button = form.querySelector("button[type=submit]");
       button.disabled = true;
-      button.textContent = "Signing in…";
+      button.textContent = "正在登录…";
       try {
         await api.login(document.querySelector("#password").value);
         location.replace("/admin/");
       } catch (error) {
         handleError(error);
         button.disabled = false;
-        button.textContent = "Sign in";
+        button.textContent = "登录";
       }
     });
   }
@@ -80,10 +104,10 @@
     const meta = document.createElement("p");
     const edit = document.createElement("a");
     title.textContent = post.title;
-    meta.textContent = `${post.date} · ${post.slug}`;
+    meta.textContent = [post.date, post.location, post.slug].filter(Boolean).join(" · ");
     edit.className = "button";
     edit.href = `editor.html?slug=${encodeURIComponent(post.slug)}`;
-    edit.textContent = "Edit";
+    edit.textContent = "编辑";
     details.append(title, meta);
     row.append(details, edit);
     return row;
@@ -100,7 +124,7 @@
       if (!posts.length) {
         const empty = document.createElement("p");
         empty.className = "empty-state";
-        empty.textContent = "No posts yet. Create the first one.";
+        empty.textContent = "还没有文章，先写第一篇吧。";
         list.append(empty);
         return;
       }
@@ -124,10 +148,13 @@
     attachLogout();
     const form = document.querySelector("#post-form");
     const title = document.querySelector("#title");
+    const postLocation = document.querySelector("#location");
     const slug = document.querySelector("#slug");
     const date = document.querySelector("#date");
     const description = document.querySelector("#description");
     const cover = document.querySelector("#cover");
+    const coverFileInput = document.querySelector("#cover-file");
+    const coverPreview = document.querySelector("#cover-preview");
     const content = document.querySelector("#content");
     const preview = document.querySelector("#preview");
     const fileInput = document.querySelector("#image-file");
@@ -137,27 +164,43 @@
     const requestedSlug = new URLSearchParams(location.search).get("slug");
     let currentSlug = requestedSlug;
     let slugTouched = Boolean(requestedSlug);
+    const slugSuffix = crypto.randomUUID().slice(0, 6);
 
     date.value = localDate();
     const updatePreview = () => { preview.innerHTML = window.BlogMarkdown.render(content.value); };
+    const suggestedSlug = () => slugify(title.value) || `post-${date.value.replace(/-/g, "")}-${slugSuffix}`;
+    const updateCoverPreview = () => {
+      const value = cover.value.trim();
+      if (!value) {
+        coverPreview.hidden = true;
+        coverPreview.removeAttribute("src");
+        return;
+      }
+      coverPreview.src = value;
+      coverPreview.hidden = false;
+    };
     content.addEventListener("input", updatePreview);
-    title.addEventListener("input", () => { if (!slugTouched) slug.value = slugify(title.value); });
+    title.addEventListener("input", () => { if (!slugTouched) slug.value = suggestedSlug(); });
+    date.addEventListener("change", () => { if (!slugTouched) slug.value = suggestedSlug(); });
     slug.addEventListener("input", () => { slugTouched = true; slug.value = slugify(slug.value); });
+    cover.addEventListener("input", updateCoverPreview);
     updatePreview();
 
     if (requestedSlug) {
       try {
         const post = await api.post(requestedSlug);
         title.value = post.title;
+        postLocation.value = post.location || "";
         slug.value = post.slug;
         slug.readOnly = true;
-        document.querySelector("#slug-help").textContent = "Slug is fixed after publication.";
+        document.querySelector("#slug-help").textContent = "文章发布后不能修改链接。";
         date.value = post.date;
         description.value = post.description || "";
         cover.value = post.cover || "";
         content.value = post.content;
-        document.querySelector("#editor-title").textContent = "Edit post";
+        document.querySelector("#editor-title").textContent = "编辑文章";
         deleteButton.hidden = false;
+        updateCoverPreview();
         updatePreview();
       } catch (error) { handleError(error); return; }
     }
@@ -170,29 +213,38 @@
       content.dispatchEvent(new Event("input"));
     }
 
-    async function upload(file) {
+    async function upload(file, destination) {
       if (!file) return;
       clearMessage();
-      const uploadLabel = document.querySelector(".upload-button span");
+      const isCover = destination === "cover";
+      const input = isCover ? coverFileInput : fileInput;
+      const uploadLabel = document.querySelector(isCover ? "#cover-upload-label" : "#content-upload-label");
       const original = uploadLabel.textContent;
-      uploadLabel.textContent = "Uploading…";
-      fileInput.disabled = true;
+      uploadLabel.textContent = "正在上传…";
+      input.disabled = true;
       try {
         const image = await api.uploadImage(file);
-        insertAtCursor(`\n![Image](${image.url})\n`);
-        showMessage("Image uploaded and inserted into the Markdown.", "success");
+        if (isCover) {
+          cover.value = image.url;
+          updateCoverPreview();
+          showMessage("封面图片上传成功。", "success");
+        } else {
+          insertAtCursor(`\n![图片](${image.url})\n`);
+          showMessage("图片上传成功，已插入正文。", "success");
+        }
       } catch (error) { handleError(error); }
-      finally { uploadLabel.textContent = original; fileInput.disabled = false; fileInput.value = ""; }
+      finally { uploadLabel.textContent = original; input.disabled = false; input.value = ""; }
     }
 
-    fileInput.addEventListener("change", () => upload(fileInput.files[0]));
+    coverFileInput.addEventListener("change", () => upload(coverFileInput.files[0], "cover"));
+    fileInput.addEventListener("change", () => upload(fileInput.files[0], "content"));
     ["dragenter", "dragover"].forEach((name) => editorPane.addEventListener(name, (event) => {
       event.preventDefault(); editorPane.classList.add("dragging");
     }));
     ["dragleave", "drop"].forEach((name) => editorPane.addEventListener(name, (event) => {
       event.preventDefault(); editorPane.classList.remove("dragging");
     }));
-    editorPane.addEventListener("drop", (event) => upload(event.dataTransfer?.files?.[0]));
+    editorPane.addEventListener("drop", (event) => upload(event.dataTransfer?.files?.[0], "content"));
 
     form.addEventListener("submit", async (event) => {
       event.preventDefault();
@@ -201,6 +253,7 @@
       publishButtons.forEach((button) => { button.disabled = true; });
       const post = {
         title: title.value,
+        location: postLocation.value,
         slug: slug.value,
         date: date.value,
         description: description.value,
@@ -212,14 +265,15 @@
         if (!currentSlug) {
           currentSlug = post.slug;
           slug.readOnly = true;
+          document.querySelector("#slug-help").textContent = "文章发布后不能修改链接。";
           deleteButton.hidden = false;
           history.replaceState(null, "", `editor.html?slug=${encodeURIComponent(currentSlug)}`);
-          document.querySelector("#editor-title").textContent = "Edit post";
+          document.querySelector("#editor-title").textContent = "编辑文章";
         }
-        showMessage("Published successfully. GitHub Pages will update shortly.", "success");
+        showMessage("发布成功，GitHub Pages 将在稍后更新。", "success");
         if (result.url) {
           const link = document.createElement("a");
-          link.href = result.url; link.target = "_blank"; link.rel = "noopener noreferrer"; link.textContent = " View commit.";
+          link.href = result.url; link.target = "_blank"; link.rel = "noopener noreferrer"; link.textContent = " 查看 GitHub 提交。";
           message.append(link);
         }
       } catch (error) { handleError(error); }
@@ -227,7 +281,7 @@
     });
 
     deleteButton.addEventListener("click", async () => {
-      if (!currentSlug || !confirm("Delete this post? Images will not be deleted.")) return;
+      if (!currentSlug || !confirm("确定删除这篇文章吗？已经上传的图片不会自动删除。")) return;
       deleteButton.disabled = true;
       try {
         await api.deletePost(currentSlug);
@@ -240,4 +294,3 @@
   if (page === "posts") initPosts();
   if (page === "editor") initEditor();
 })();
-

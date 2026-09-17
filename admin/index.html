@@ -1,11 +1,11 @@
 <!doctype html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="robots" content="noindex,nofollow" />
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src https://api.chengzeliu.com http://127.0.0.1:8787 http://localhost:8787; img-src 'self' https://img.chengzeliu.com data: blob:; style-src 'self'; script-src 'self'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'" />
-  <title>Blog Admin</title>
+  <title>博客后台</title>
   <link rel="stylesheet" href="admin.css" />
   <script src="api.js" defer></script>
   <script src="admin.js" defer></script>
@@ -14,28 +14,27 @@
   <header class="app-header">
     <div class="app-shell header-row">
       <a class="brand" href="/admin/">CL</a>
-      <nav class="header-actions" aria-label="Admin navigation">
-        <a href="/blog/">View blog</a>
-        <button id="logout" class="text-button" type="button">Sign out</button>
+      <nav class="header-actions" aria-label="管理后台导航">
+        <a href="/blog/">查看博客</a>
+        <button id="logout" class="text-button" type="button">退出登录</button>
       </nav>
     </div>
   </header>
   <main class="app-shell page">
     <div class="title-row">
       <div>
-        <p class="eyebrow">Publishing</p>
-        <h1>Blog Admin</h1>
+        <p class="eyebrow">文章管理</p>
+        <h1>博客后台</h1>
       </div>
-      <a class="button primary" href="editor.html">New post</a>
+      <a class="button primary" href="editor.html">新建文章</a>
     </div>
     <div id="message" class="notice" role="status" aria-live="polite" hidden></div>
     <section aria-labelledby="posts-title">
-      <h2 id="posts-title" class="visually-hidden">Posts</h2>
+      <h2 id="posts-title" class="visually-hidden">文章列表</h2>
       <div id="post-list" class="post-list" aria-busy="true">
-        <p class="loading">Loading posts…</p>
+        <p class="loading">正在加载文章…</p>
       </div>
     </section>
   </main>
 </body>
 </html>
-
