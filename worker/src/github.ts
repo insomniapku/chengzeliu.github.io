@@ -23,11 +23,15 @@ function encodePath(path: string): string {
 
 export class GitHubClient implements GitHubStorage {
   private readonly apiBase: string;
+  private readonly fetcher: Fetcher;
 
   constructor(
     private readonly env: Env,
-    private readonly fetcher: Fetcher = fetch,
+    fetcher?: Fetcher,
   ) {
+    // Cloudflare's native fetch requires the global receiver. Wrapping it in an
+    // arrow function prevents an illegal invocation when called as a class field.
+    this.fetcher = fetcher ?? ((input, init) => globalThis.fetch(input, init));
     const owner = encodeURIComponent(requiredConfig(env.GITHUB_OWNER, "GITHUB_OWNER"));
     const repository = encodeURIComponent(requiredConfig(env.GITHUB_REPO, "GITHUB_REPO"));
     this.apiBase = `https://api.github.com/repos/${owner}/${repository}`;
@@ -48,7 +52,8 @@ export class GitHubClient implements GitHubStorage {
           ...init?.headers,
         },
       });
-    } catch {
+    } catch (error) {
+      console.error("GitHub fetch failed", error);
       throw new ApiError(502, "GITHUB_UNAVAILABLE", "GitHub could not be reached.");
     }
 
@@ -122,4 +127,3 @@ export class GitHubClient implements GitHubStorage {
     return { sha: result.commit.sha, url: result.commit.html_url ?? "" };
   }
 }
-
